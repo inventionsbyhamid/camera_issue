@@ -74,8 +74,10 @@ public class TestMp4MuxerActivity extends AppCompatActivity {
             @Override
             public void onGLDraw(ICanvasGL canvasGL, List<GLTexture> producedTextures, List<GLTexture> consumedTextures) {
                 GLTexture texture = producedTextures.get(0);
+                RawTexture rawCameraTexture = texture.getRawTexture();
+                rawCameraTexture.setIsFlippedVertically(true);
                 GLTexture mediaTexture = producedTextures.get(1);
-                drawVideoFrame(canvasGL, texture.getSurfaceTexture(), texture.getRawTexture(), mediaTexture);
+                drawVideoFrame(canvasGL, texture.getSurfaceTexture(), rawCameraTexture, mediaTexture);
             }
 
         });
@@ -83,7 +85,7 @@ public class TestMp4MuxerActivity extends AppCompatActivity {
         outDirTxt.setText(outputDir);
 
 
-        instantVideoCamera = new InstantVideoCamera(Camera.CameraInfo.CAMERA_FACING_FRONT, 640, 480);
+        instantVideoCamera = new InstantVideoCamera(Camera.CameraInfo.CAMERA_FACING_BACK, 640, 480);
 //        instantVideoCamera = new InstantVideoCamera(Camera.CameraInfo.CAMERA_FACING_FRONT, 1280, 720);
 
         handlerThread = new HandlerThread("StreamPublisherOpen");
@@ -102,8 +104,10 @@ public class TestMp4MuxerActivity extends AppCompatActivity {
                     @Override
                     public void onGLDraw(ICanvasGL canvasGL, List<GLTexture> producedTextures, List<GLTexture> consumedTextures) {
                         GLTexture texture = consumedTextures.get(1);
+                        RawTexture rawCameraTexture = texture.getRawTexture();
+                        rawCameraTexture.setIsFlippedVertically(true);
                         GLTexture mediaTexture = consumedTextures.get(0);
-                        drawVideoFrame(canvasGL, texture.getSurfaceTexture(), texture.getRawTexture(), mediaTexture);
+                        drawVideoFrame(canvasGL, texture.getSurfaceTexture(), rawCameraTexture, mediaTexture);
                         Loggers.i("DEBUG", "gl draw");
                     }
 
@@ -136,7 +140,8 @@ public class TestMp4MuxerActivity extends AppCompatActivity {
         TextureFilter textureFilterRT = new HueFilter(180);
         int width = outsideTexture.getWidth();
         int height = outsideTexture.getHeight();
-        canvasGL.drawSurfaceTexture(outsideTexture, outsideSurfaceTexture, 0, 0, width /2, height /2, textureFilterLT);
+
+        canvasGL.drawSurfaceTexture(outsideTexture, outsideSurfaceTexture, 0, 0, 500, 500, textureFilterLT);
         canvasGL.drawSurfaceTexture(outsideTexture, outsideSurfaceTexture, 0, height/2, width/2, height, textureFilterRT);
 
         SurfaceTexture mediaSurfaceTexture = mediaTexture.getSurfaceTexture();

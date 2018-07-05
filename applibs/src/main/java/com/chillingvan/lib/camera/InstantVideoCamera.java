@@ -71,6 +71,8 @@ public class InstantVideoCamera implements CameraInterface {
 
         Camera.Parameters parms = camera.getParameters();
 
+        camera.setDisplayOrientation(90);
+
         CameraUtils.choosePreviewSize(parms, previewWidth, previewHeight);
         isOpened = true;
     }
