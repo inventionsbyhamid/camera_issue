@@ -27,7 +27,9 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Surface;
 import android.view.View;
 import android.widget.TextView;
@@ -41,6 +43,7 @@ import com.chillingvan.canvasgl.textureFilter.HueFilter;
 import com.chillingvan.canvasgl.textureFilter.TextureFilter;
 import com.chillingvan.canvasgl.util.Loggers;
 import com.chillingvan.instantvideo.sample.R;
+import com.chillingvan.instantvideo.sample.filter.CropFilter;
 import com.chillingvan.instantvideo.sample.test.camera.CameraPreviewTextureView;
 import com.chillingvan.lib.camera.InstantVideoCamera;
 import com.chillingvan.lib.encoder.video.H264Encoder;
@@ -84,6 +87,10 @@ public class TestMp4MuxerActivity extends AppCompatActivity {
         outDirTxt = (TextView) findViewById(R.id.output_dir_txt);
         outDirTxt.setText(outputDir);
 
+        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)cameraPreviewTextureView.getLayoutParams();
+        layoutParams.height = 1350;
+        layoutParams.width = 1080;
+
 
         instantVideoCamera = new InstantVideoCamera(Camera.CameraInfo.CAMERA_FACING_BACK, 640, 480);
 //        instantVideoCamera = new InstantVideoCamera(Camera.CameraInfo.CAMERA_FACING_FRONT, 1280, 720);
@@ -97,7 +104,7 @@ public class TestMp4MuxerActivity extends AppCompatActivity {
                 playMedia();
 //                StreamPublisher.StreamPublisherParam streamPublisherParam = new StreamPublisher.StreamPublisherParam();
 //                StreamPublisher.StreamPublisherParam streamPublisherParam = new StreamPublisher.StreamPublisherParam(1080, 640, 9500 * 1000, 30, 1, 44100, 19200);
-                StreamPublisher.StreamPublisherParam streamPublisherParam = new StreamPublisher.StreamPublisherParam(1080, 750, 1500 * 1000, 30, 1, 44100, 19200);
+                StreamPublisher.StreamPublisherParam streamPublisherParam = new StreamPublisher.StreamPublisherParam(480, 608, 1500 * 1000, 30, 1, 44100, 19200);
                 streamPublisherParam.outputFilePath = outputDir;
                 streamPublisherParam.setInitialTextureCount(2);
                 streamPublisher.prepareEncoder(streamPublisherParam, new H264Encoder.OnDrawListener() {
@@ -141,8 +148,12 @@ public class TestMp4MuxerActivity extends AppCompatActivity {
         int width = outsideTexture.getWidth();
         int height = outsideTexture.getHeight();
 
-        canvasGL.drawSurfaceTexture(outsideTexture, outsideSurfaceTexture, 0, 0, 500, 500, textureFilterLT);
-        canvasGL.drawSurfaceTexture(outsideTexture, outsideSurfaceTexture, 0, height/2, width/2, height, textureFilterRT);
+        float scaleX = 1.0f;
+        float scaleY = 1080.0f/640.0f;
+        Log.d("zzz", "ScaleX = "+scaleX);
+        Log.d("zzz", "scaleY = "+ scaleY);
+        canvasGL.drawSurfaceTexture(outsideTexture, outsideSurfaceTexture, 0, 0, 500, 500, new CropFilter(scaleX,scaleY, 1080, 1350, 1080,1080));
+//        canvasGL.drawSurfaceTexture(outsideTexture, outsideSurfaceTexture, 0, height/2, width/2, height, textureFilterRT);
 
         SurfaceTexture mediaSurfaceTexture = mediaTexture.getSurfaceTexture();
         RawTexture mediaRawTexture = mediaTexture.getRawTexture();
